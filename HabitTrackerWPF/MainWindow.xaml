@@ -1,0 +1,174 @@
+﻿<Window x:Class="HabitTracker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Habit Tracker v1.0" Height="650" Width="1100" MinWidth="900"
+        Background="White" Name="RootWindow">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Файл">
+                <MenuItem Header="Сохранить" Click="SaveBtn_Click"/>
+                <MenuItem Header="Загрузить"/>
+                <Separator/>
+                <MenuItem Header="Выход" Click="Exit_Click"/>
+            </MenuItem>
+            <MenuItem Header="Правка">
+                <MenuItem Header="Копировать"/>
+                <MenuItem Header="Вставить"/>
+            </MenuItem>
+            <MenuItem Header="Вид">
+                <MenuItem Header="Светлая тема" Click="SetLightTheme"/>
+                <MenuItem Header="Темная тема" Click="SetDarkTheme"/>
+            </MenuItem>
+        </Menu>
+
+        <ToolBarTray DockPanel.Dock="Top">
+            <ToolBar>
+                <Button Content="💾" ToolTip="Быстрое сохранение" Click="SaveBtn_Click"/>
+                <Separator/>
+                <ToggleButton x:Name="EditModeToggle" Content="Режим редактирования" Click="ToggleEditMode"/>
+            </ToolBar>
+        </ToolBarTray>
+
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem>
+                <TextBlock x:Name="StatusInfo" Text="Программа готова к работе"/>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <ProgressBar x:Name="BottomProgress" Width="100" Height="10"/>
+            </StatusBarItem>
+        </StatusBar>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="350"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="250"/>
+            </Grid.ColumnDefinitions>
+
+            <TabControl Grid.Column="0" Margin="5" SelectionChanged="TabControl_SelectionChanged">
+                <TabItem Header="Личные данные">
+                    <ScrollViewer>
+                        <StackPanel Margin="10">
+                            <GroupBox Header="Основная информация" Margin="0,5">
+                                <StackPanel>
+                                    <Label Content="Имя:"/>
+                                    <TextBox x:Name="FirstNameTxt"/>
+                                    <Label Content="Фамилия:"/>
+                                    <TextBox x:Name="LastNameTxt"/>
+                                    <Label Content="Пароль:"/>
+                                    <PasswordBox x:Name="UserPass"/>
+                                </StackPanel>
+                            </GroupBox>
+
+                            <GroupBox Header="Дополнительные данные" Margin="0,5">
+                                <StackPanel>
+                                    <Label Content="Дата рождения:"/>
+                                    <DatePicker x:Name="BirthDatePicker"/>
+                                    <Label Content="Образование:"/>
+                                    <ComboBox x:Name="EduCombo">
+                                        <ComboBoxItem Content="Среднее"/>
+                                        <ComboBoxItem Content="Среднее специальное"/>
+                                        <ComboBoxItem Content="Высшее"/>
+                                        <ComboBoxItem Content="Аспирантура"/>
+                                    </ComboBox>
+                                    <Label Content="Хобби:"/>
+                                    <ListBox x:Name="HobbyList" SelectionMode="Multiple" Height="80">
+                                        <ListBoxItem Content="Спорт"/>
+                                        <ListBoxItem Content="Чтение"/>
+                                        <ListBoxItem Content="Музыка"/>
+                                        <ListBoxItem Content="Программирование"/>
+                                        <ListBoxItem Content="Путешествия"/>
+                                    </ListBox>
+                                </StackPanel>
+                            </GroupBox>
+
+                            <GroupBox Header="Настройки отображения">
+                                <StackPanel>
+                                    <CheckBox x:Name="NotifyCheck" Content="Получать уведомления"/>
+                                    <CheckBox Content="Показывать статистику публично"/>
+                                    <CheckBox Content="Автосохранение"/>
+                                    <Label Content="Уровень активности:" Margin="0,5,0,0"/>
+                                    <RadioButton x:Name="LowRad" Content="Низкий" GroupName="Activity"/>
+                                    <RadioButton x:Name="MidRad" Content="Средний" GroupName="Activity" IsChecked="True"/>
+                                    <RadioButton x:Name="HighRad" Content="Высокий" GroupName="Activity"/>
+                                </StackPanel>
+                            </GroupBox>
+
+                            <Button Content="Сбросить" Click="Reset_Click" Margin="0,10" Height="30"/>
+                            <Button Content="Сохранить профиль" Click="SaveBtn_Click" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Header="Привычки">
+                    <TextBlock Text="Перейдите в центральную панель для управления" TextWrapping="Wrap" Margin="20"/>
+                </TabItem>
+                <TabItem Header="Статистика" x:Name="StatTabItem"/>
+            </TabControl>
+
+            <Border Grid.Column="1" BorderBrush="#DDD" BorderThickness="1" Margin="5" CornerRadius="5">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0">
+                        <Label Content="Продуктивность (%)"/>
+                        <Slider x:Name="ProdSlider" Minimum="0" Maximum="100" ValueChanged="UpdateProgress"/>
+                        <Label Content="Удовлетворенность (%)"/>
+                        <Slider x:Name="HappySlider" Minimum="0" Maximum="100" ValueChanged="UpdateProgress"/>
+                        <ProgressBar x:Name="DayProgress" Height="20" Margin="0,10"/>
+                    </StackPanel>
+
+                    <DockPanel Grid.Row="1" Margin="0,5">
+                        <Button DockPanel.Dock="Right" Content="Добавить" Width="70" Click="AddHabit_Click"/>
+                        <TextBox x:Name="NewHabitName" Margin="0,0,5,0"/>
+                    </DockPanel>
+
+                    <DataGrid x:Name="HabitsGrid" Grid.Row="2" AutoGenerateColumns="False" CanUserAddRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Привычка" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTextColumn Header="Время" Binding="{Binding Time}" Width="80"/>
+                            <DataGridCheckBoxColumn Header="Выполнено" Binding="{Binding IsCompleted}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <StackPanel Grid.Row="3" Margin="0,10,0,0">
+                        <Label Content="Заметки о дне:"/>
+                        <RichTextBox x:Name="NotesBox" Height="80"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <StackPanel Grid.Column="2" Margin="5">
+                <Label Content="Аватар:" HorizontalAlignment="Center"/>
+                <Border BorderBrush="Gray" BorderThickness="1" Width="120" Height="120">
+                    <Image x:Name="AvatarImg" Stretch="UniformToFill"/>
+                </Border>
+                <Button Content="Загрузить фото" Click="LoadImage_Click" Margin="20,5"/>
+
+                <Calendar x:Name="MainCalendar" Margin="0,10"/>
+
+                <Label Content="Категории:"/>
+                <TreeView Height="120">
+                    <TreeViewItem Header="Здоровье" IsExpanded="True">
+                        <TreeViewItem Header="Зарядка"/>
+                        <TreeViewItem Header="Вода"/>
+                    </TreeViewItem>
+                    <TreeViewItem Header="Работа">
+                        <TreeViewItem Header="Программирование"/>
+                    </TreeViewItem>
+                </TreeView>
+
+                <Label Content="Лог активности:"/>
+                <ListView x:Name="LogView" Height="100">
+                    <ListViewItem Content="08:00 - Подъем"/>
+                    <ListViewItem Content="09:00 - Коддинг"/>
+                </ListView>
+            </StackPanel>
+        </Grid>
+    </DockPanel>
+</Window>
