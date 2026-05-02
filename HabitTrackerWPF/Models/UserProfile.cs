@@ -1,12 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace HabitTrackerWPF.Models
+namespace HabitTracker.Models
 {
-    internal class UserProfile
+    public class UserProfile
     {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Education { get; set; }
+        public DateTime? BirthDate { get; set; }
+        public List<string> Hobbies { get; set; } = new List<string>();
+        public string ActivityLevel { get; set; }
     }
 }
