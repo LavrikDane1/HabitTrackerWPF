@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace HabitTrackerWPF
 {
-    internal class UserProfile
+    internal class Habit
     {
     }
 }
