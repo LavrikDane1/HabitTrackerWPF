@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HabitTrackerWPF.Models
+namespace HabitTrackerWPF
 {
-    internal class AppData
+    internal class UserProfile
     {
     }
 }
